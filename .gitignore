@@ -1,3 +1,7 @@
+build/
+.clangd/
+.swp
+
 # Prerequisites
 *.d
 
