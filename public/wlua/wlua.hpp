@@ -23,23 +23,23 @@ struct function<_ret(_args...), _fp> {
 };
 
 template <typename _arg>
-static inline auto pop_arg(_arg& arg, lua_State* handle, size_t i)
+inline auto pop_arg(_arg& arg, lua_State* handle, size_t i)
     -> std::enable_if_t<std::is_integral_v<_arg>, void> {
   arg = lua_tointeger(handle, i);
 }
 
 template <typename _arg>
-static inline auto pop_arg(_arg& arg, lua_State* handle, size_t i)
+inline auto pop_arg(_arg& arg, lua_State* handle, size_t i)
     -> std::enable_if_t<std::is_floating_point_v<_arg>, void> {
   arg = lua_tonumber(handle, i);
 }
 
-static inline auto pop_arg(const char*& arg, lua_State* handle, size_t i) {
+inline auto pop_arg(const char*& arg, lua_State* handle, size_t i) {
   arg = lua_tostring(handle, i);
 }
 
 template <typename _args, size_t... _indexes>
-static inline void pop_all_args(lua_State* handle,
+inline void pop_all_args(lua_State* handle,
                                 _args& args,
                                 std::index_sequence<_indexes...>) {
   (pop_arg(std::get<_indexes>(args), handle, _indexes + 1), ...);
@@ -92,15 +92,15 @@ struct lua_bind {
   }
 };
 
-static inline void push_arg(lua_State* handle, lua_Integer arg) {
+inline void push_arg(lua_State* handle, lua_Integer arg) {
   lua_pushinteger(handle, arg);
 }
 
-static inline void push_arg(lua_State* handle, lua_Number arg) {
+inline void push_arg(lua_State* handle, lua_Number arg) {
   lua_pushnumber(handle, arg);
 }
 
-static inline void push_arg(lua_State* handle, const char* arg) {
+inline void push_arg(lua_State* handle, const char* arg) {
   lua_pushstring(handle, arg);
 }
 
@@ -111,26 +111,26 @@ inline void lua_invoke(lua_State* handle, const char* name, _args&&... args) {
 }
 
 template <typename _result_type>
-static inline auto pop_result(lua_State* handle)
+inline auto pop_result(lua_State* handle)
     -> std::enable_if_t<std::is_integral_v<_result_type>, lua_Integer> {
   return lua_tointeger(handle, -1);
 }
 
 template <typename _result_type>
-static inline auto pop_result(lua_State* handle)
+inline auto pop_result(lua_State* handle)
     -> std::enable_if_t<std::is_floating_point_v<_result_type>, lua_Number> {
   return lua_tonumber(handle, -1);
 }
 
 template <typename _result_type>
-static inline auto pop_result(lua_State* handle)
+inline auto pop_result(lua_State* handle)
     -> std::enable_if_t<std::is_same_v<const char*, _result_type>,
                         const char*> {
   return lua_tostring(handle, -1);
 }
 
 template <typename _result_type>
-static inline auto pop_result(lua_State* handle)
+inline auto pop_result(lua_State* handle)
     -> std::enable_if_t<std::is_same_v<void, _result_type>, void> {
   return;
 }
