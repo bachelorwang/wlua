@@ -40,8 +40,8 @@ inline auto pop_arg(const char*& arg, lua_State* handle, size_t i) {
 
 template <typename TArgs, size_t... TIndexes>
 inline void pop_all_args(lua_State* handle,
-                                TArgs& args,
-                                std::index_sequence<TIndexes...>) {
+                         TArgs& args,
+                         std::index_sequence<TIndexes...>) {
   (pop_arg(std::get<TIndexes>(args), handle, TIndexes + 1), ...);
 }
 
@@ -124,8 +124,7 @@ inline auto pop_result(lua_State* handle)
 
 template <typename TResultType>
 inline auto pop_result(lua_State* handle)
-    -> std::enable_if_t<std::is_same_v<const char*, TResultType>,
-                        const char*> {
+    -> std::enable_if_t<std::is_same_v<const char*, TResultType>, const char*> {
   return lua_tostring(handle, -1);
 }
 
@@ -142,7 +141,7 @@ template <typename TRet, typename... TArgs>
 struct c_bind<TRet(TArgs...)> {
   lua_State* handle_ = nullptr;
   const char* func_name_ = nullptr;
-  TRet operator()(TArgs... args) {
+  TRet operator()(TArgs&&... args) {
     lua_invoke(handle_, func_name_, std::forward<TArgs>(args)...);
     lua_pcall(handle_, sizeof...(args), 1, 0);
     return pop_result<TRet>(handle_);
